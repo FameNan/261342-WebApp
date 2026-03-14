@@ -13,9 +13,12 @@
                        class="bg-white dark:bg-gray-800 shadow sm:rounded-lg overflow-hidden hover:shadow-lg transition">
                         @if ($product->image)
     @if (str_starts_with($product->image, 'http'))
+        {{-- ถ้าเป็นรูปจาก URL ภายนอก --}}
         <img src="{{ $product->image }}" class="w-full h-48 object-cover">
     @else
-        <img src="{{ asset('storage/products/' . $product->image) }}" class="w-full h-48 object-cover">
+        {{-- เปลี่ยนมาใช้ route('product.photo') ตามที่ตั้งค่าไว้ใน web.php --}}
+        <img src="{{ route('product.photo', ['filename' => basename($product->image)]) }}" 
+             class="w-full h-48 object-cover">
     @endif
 @else
     <div class="w-full h-48 bg-gray-200 flex items-center justify-center">

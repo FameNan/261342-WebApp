@@ -8,16 +8,16 @@
             {{-- รูปสินค้า --}}
             <div class="bg-gray-50 flex items-center justify-center p-6">
                 @if($product->image)
-                    @if(str_starts_with($product->image, 'http'))
-                        <img src="{{ $product->image }}" class="w-full max-h-80 object-contain rounded-xl">
-                    @else
-                        <img src="{{ asset('storage/products/'.$product->image) }}" class="w-full max-h-80 object-contain rounded-xl">
-                    @endif
-                @else
-                    <div class="w-full h-80 bg-gray-200 flex items-center justify-center rounded-xl">
-                        <span class="text-gray-400">No Image</span>
-                    </div>
-                @endif
+    @if(str_starts_with($product->image, 'http'))
+        {{-- ถ้าเป็นรูปจากเน็ต --}}
+        <img src="{{ $product->image }}" class="w-full max-h-80 object-contain rounded-xl">
+    @else
+        {{-- ถ้าเป็นรูปในเครื่อง (เรียกผ่าน Route) --}}
+        <img src="{{ route('product.photo', ['filename' => basename($product->image)]) }}" 
+             class="w-full max-h-80 object-contain rounded-xl">
+    @endif
+@endif
+
             </div>
 
             {{-- ข้อมูลสินค้า --}}
@@ -65,10 +65,23 @@
                 {{-- ปุ่ม --}}
                 <div class="flex gap-2 mt-6">
 
+                    {{-- Wishlist --}}
+                    @auth
+                    @if($inWishlist)
+                    <form method="POST" action="{{ route('wishlist.destroy', \App\Models\Wishlist::where('user_id', Auth::id())->where('product_id', $product->product_id)->first()?->wishlist_id) }}">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="w-12 h-12 border-2 border-yellow-400 rounded-xl text-yellow-400 hover:bg-yellow-50 transition text-lg">
+                            ★
+                        </button>
+                    </form>
+                    @else
                     <button id="wishlist-btn" onclick="toggleWishlist({{ $product->product_id }})"
-    class="w-12 h-12 border-2 {{ $inWishlist ? 'border-yellow-400 text-yellow-400' : 'border-gray-200 text-gray-400' }} rounded-xl hover:border-yellow-400 hover:text-yellow-400 transition text-lg">
-    {{ $inWishlist ? '★' : '☆' }}
-</button>
+                        class="w-12 h-12 border-2 border-gray-200 text-gray-400 rounded-xl hover:border-yellow-400 hover:text-yellow-400 transition text-lg">
+                        ☆
+                    </button>
+                    @endif
+                    @endauth
 
                     {{-- Add to cart --}}
                     <form method="POST" action="{{ route('carts.store') }}" class="flex-1">
@@ -108,13 +121,12 @@ function changeQty(change) {
     document.getElementById('quantity-input').value = value;
     document.getElementById('quantity-input-now').value = value;
 }
-</script>
-{{--{{crsf_token}} can work bc of blade render  so no need to rely on meta tag--}}
-<script>
+
 function toggleWishlist(productId) {
     const btn = document.getElementById('wishlist-btn');
+    if (!btn) return;
     const isWishlisted = btn.innerText.trim() === '★';
-    
+
     fetch('/wishlists/toggle', {
         method: 'POST',
         headers: {

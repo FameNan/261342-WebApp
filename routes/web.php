@@ -8,6 +8,10 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\AdminController;
+//for call pic from storage
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Response;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -54,8 +58,36 @@ Route::post('/wishlists', [WishlistController::class, 'store'])->name('wishlist.
 Route::post('/wishlists/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 Route::delete('/wishlists/{wishlist}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
 
+//call picture
+Route::get('/product-photo/{filename}', function ($filename) {
+    // กำหนด path ที่เก็บรูปสินค้า (ตรวจสอบว่าในเครื่องเก็บไว้ที่ไหน)
+    $path = 'products/' . $filename;
+
+    if (!Storage::disk('public')->exists($path)) {
+        abort(404);
+    }
+
+    $file = Storage::disk('public')->get($path);
+    $type = Storage::disk('public')->mimeType($path);
+
+    return Response::make($file, 200)->header("Content-Type", $type);
+})->name('product.photo');
     
 });
 
-
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/', [AdminController::class, 'index'])->name('admin.index');
+    Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
+    Route::patch('/users/{id}/role', [AdminController::class, 'updateRole'])->name('admin.users.updateRole');
+    Route::post('/admin/users/add-admin', [AdminController::class, 'storeAdmin'])->name('admin.users.storeAdmin');
+    Route::delete('/users/{id}', [AdminController::class, 'destroy'])->name('admin.users.destroy');
+    Route::get('/products', [AdminController::class, 'products'])->name('admin.products');
+    Route::delete('/products/{id}', [AdminController::class, 'destroyProduct'])->name('admin.products.destroy');
+    Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders');
+    Route::patch('/orders/{id}/packing', [AdminController::class, 'markAsPacking'])->name('admin.orders.packing');
+    Route::patch('/orders/{id}/delivering', [AdminController::class, 'markAsDelivering'])->name('admin.orders.delivering');
+    Route::patch('/orders/{id}/complete', [AdminController::class, 'markAsComplete'])->name('admin.orders.complete');
+    Route::patch('/orders/{id}/processing', [AdminController::class, 'markAsProcessing'])->name('admin.orders.processing');
+    Route::patch('/orders/{id}/status', [AdminController::class, 'updateStatus'])->name('admin.orders.updateStatus');
+});
 require __DIR__.'/auth.php';

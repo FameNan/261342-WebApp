@@ -7,6 +7,8 @@ use App\Models\Product;
 use Illuminate\Support\Facades\Storage; // import storage facade for handling file uploads
 use App\Models\Wishlist;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Tag;
+
 class ProductController extends Controller
 {
     /**
@@ -23,7 +25,9 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return view('products.create');
+        //pull all tags from database
+        $tags = Tag::all();
+        return view('products.create',compact('tags'));
     }
 
     /**
@@ -100,7 +104,7 @@ class ProductController extends Controller
 
         $product->update($validatedData);
 
-        return redirect()->route('products.index')->with('success', 'Product updated successfully.');
+        return redirect()->route('admin.products')->with('success', 'Product updated successfully.');
     }
 
     /**
