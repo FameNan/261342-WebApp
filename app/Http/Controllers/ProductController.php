@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\Storage; // import storage facade for handling file uploads
-
+use App\Models\Wishlist;
+use Illuminate\Support\Facades\Auth;
 class ProductController extends Controller
 {
     /**
@@ -58,7 +59,9 @@ class ProductController extends Controller
        $product = Product::with('tags')
                 ->where('product_id', $id)
                 ->firstOrFail();
-    return view('products.show', compact('product'));
+        //check if the product is in the user's wishlist
+        $inWishlist = Auth::check()? $product->wishlists()->where('user_id', Auth::id())->exists() : false;
+    return view('products.show', compact('product', 'inWishlist'));
     }
 
     /**

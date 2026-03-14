@@ -7,6 +7,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\WishlistController;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -46,6 +47,13 @@ Route::get('/payments', [PaymentController::class, 'index'])->name('payments.ind
 Route::get('/payments/create/{order_id}', [PaymentController::class, 'create'])->name('payments.create');
 Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
 Route::get('/payments/{id}', [PaymentController::class, 'show'])->name('payments.show');
+//wishlist
+Route::get('/wishlists', [WishlistController::class, 'index'])->name('wishlist.index');
+Route::post('/wishlists', [WishlistController::class, 'store'])->name('wishlist.store');
+//when user click the wishlist button, it will toggle the wishlist status of the product
+Route::post('/wishlists/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+Route::delete('/wishlists/{wishlist}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
+
     
 });
 
