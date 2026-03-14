@@ -42,6 +42,11 @@ class OrderController extends Controller
         'products' => 'required|array|min:1',
         'products.*.product_id' => 'required|exists:products,product_id',
         'products.*.quantity'  => 'required|integer|min:1',
+        //collect data for order details from user input, such as name, address, phone number, payment method, etc. (for order confirmation page)
+        'name'             => 'required|string',
+        'address'          => 'required|string',
+        'phone'            => 'required|string|max:10',
+        'payment_method'   => 'required|in:promptpay,credit_card,bank_transfer,cash_on_delivery',
         ]);
         // Fetch products and calculate total price
     $productIds = collect($validated['products'])->pluck('product_id');
@@ -54,6 +59,7 @@ class OrderController extends Controller
         'status'      => 'pending',
         'total_amount' => $total,
         'order_date'   => now(),
+        'address'      => $validated['address'],
     ]);
     $orderItems = collect($validated['products'])->map(
             fn($item) => [
@@ -66,17 +72,38 @@ class OrderController extends Controller
         $order->items()->createMany($orderItems);
 // Clear user's cart after order creation
         Auth::user()->cart()->first()?->items()->delete();
-    return redirect()->route('orders.show', $order->order_id)
-                     ->with('success', 'Order created successfully');
+    return redirect()->route('payments.create', $order->order_id)
+                 ->with('success', 'Order created successfully');
     }
 
+        public function show(string $id)
+{
+    $order = Auth::user()
+        ->orders()
+        ->with('items.product')
+        ->findOrFail($id);
+
+    return view('orders.show', compact('order'));
+}
+// For "Buy Now" functionality, we can create a separate method that creates an order directly from a single product without going through the cart.
+public function edit(string $id)
+{
+    $order = Auth::user()
+        ->orders()
+        ->with('items.product')
+        ->findOrFail($id);
+
+    $products = Product::all();
+
+    return view('orders.edit', compact('order', 'products'));
+}
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
 {
     $order = Auth::user()->orders()->findOrFail($id);
-
+    
     $validated = $request->validate([
         'products' => 'required|array|min:1',
         'products.*.product_id' => 'required|exists:products,product_id',
@@ -101,10 +128,27 @@ class OrderController extends Controller
             fn($item) => $products[$item['product_id']]->price * $item['quantity']
         );
         $order->update(['total_amount' => $total]);
+        // Prevent updates to paid orders
+        if ($order->isPaid()) {
+        return redirect()->back()
+                       ->with('error', 'Cannot update order that has already been paid.');
+    }
 
         return redirect()->route('orders.show', $order->order_id)
                          ->with('success', 'Order updated successfully');
     });
+}
+//need confirm order page before store order, to show order summary and confirm before place order
+public function confirm()
+{
+    $cart = Auth::user()->cart()->with('items.product')->first();
+
+    if (!$cart || $cart->items->isEmpty()) {
+        return redirect()->route('carts.index')
+                       ->with('error', 'Cart is empty.');
+    }
+
+    return view('orders.confirm', compact('cart'));
 }
 
     //status pending(default) -> processing -> packing -> delivering -> complete
@@ -138,16 +182,7 @@ class OrderController extends Controller
      /**
      * Update the specified resource in storage.
      */
-    public function markAsDelivering(string $id) //according to the order flow (order status), only orders in packing status can be marked as delivering
-    {
-        $order = Order::where('order_id', $id)->firstOrFail();
-        if ($order->status !== 'packing') {
-            return redirect()->back()->with('error', 'Only orders in packing status can be marked as delivering.');
-        }
-        $order->markAsDelivering();
-        return redirect()->route('orders.show', $order->order_id)
-                         ->with('success', 'Order marked as delivering successfully.');
-    }
+    
     /**
      * Mark order as complete
      */
@@ -163,7 +198,43 @@ class OrderController extends Controller
         $order->markAsComplete();
         return redirect()->route('orders.index')->with('success', 'Order marked as complete.');
     }
-    
+    // Mark order as paid
+    public function markAsPaid(string $id)
+{
+    $order = Auth::user()->orders()->findOrFail($id);
+
+    if ($order->isPaid()) {
+        return redirect()->back()
+                       ->with('error', 'Order already paid.');
+    }
+
+    $order->payments()->create([
+        'status'       => 'paid',
+        'method'       => 'manual',
+        'amount'       => $order->total_amount,
+        'payment_date' => now(),
+    ]);
+
+    $order->markAsProcessing();
+
+    return redirect()->route('orders.show', $order->order_id)
+                     ->with('success', 'Payment confirmed!');
+}
+
+public function cancel(string $id)
+{
+    $order = Auth::user()->orders()->findOrFail($id);
+
+    if ($order->status !== 'pending') {
+        return redirect()->back()
+                       ->with('error', 'Only pending orders can be cancelled.');
+    }
+
+    $order->markAsCancelled();
+
+    return redirect()->route('orders.index')
+                     ->with('success', 'Order cancelled successfully.');
+}
     /**
      * Remove the specified resource from storage.
      */
@@ -174,4 +245,6 @@ class OrderController extends Controller
 
         return redirect()->route('orders.index')->with('success', 'Order deleted successfully.');
     }
+
+
 }

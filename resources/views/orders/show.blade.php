@@ -70,11 +70,19 @@
                 </div>
 
                 {{-- ปุ่มกลับ --}}
-                <div class="mt-6 flex justify-between">
-                    <a href="{{ route('orders.index') }}" class="text-sm text-gray-500 hover:underline">
-                        ← กลับไปคำสั่งซื้อทั้งหมด
-                    </a>
-                </div>
+<div class="mt-6 flex justify-between items-center">
+    <a href="{{ route('orders.index') }}" class="text-sm text-gray-500 hover:underline">
+        ← กลับไปคำสั่งซื้อทั้งหมด
+    </a>
+
+    {{-- ปุ่มแก้ไข --}}
+    @if($order->status === 'pending')
+        <a href="{{ route('orders.edit', $order->order_id) }}" 
+           class="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 text-sm">
+            แก้ไขคำสั่งซื้อ
+        </a>
+    @endif
+</div>
 
             </div>
 

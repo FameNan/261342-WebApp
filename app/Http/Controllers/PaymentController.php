@@ -22,9 +22,12 @@ class PaymentController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    //string $order_id ==> /payments/create/1 
+    //if use $request->order_id ==> /payments/create?order_id=1
+    public function create(Request $request,string $order_id)
     {
-        return view('payments.create');
+        $order = Auth::user()->orders()->findOrFail($order_id);
+        return view('payments.create', compact('order'));
     }
 
     /**
@@ -36,17 +39,20 @@ class PaymentController extends Controller
             'order_id' => 'required|exists:orders,order_id',
             'amount'   => 'required|numeric',
             'method'   => 'required|string',
-            'status'   => 'required|string',
+            //no need to validate status as it will be set to pending by default
+            //'status'   => 'required|string',
         ]);
         $validatedData['payment_date'] = now();
-        $validatedData['user_id'] = Auth::id();
-        $validatedData['status'] = 'pending'; // Default status is pending
+        $validatedData['status'] = 'paid'; // Default status is pending
 
-        $order = Auth::user()->orders()->findOrFail($validated['order_id']);
-
-        $order->payment()->create($validated);
-
-        return redirect()->route('payments.index')
+        $order = Auth::user()->orders()->findOrFail($validatedData['order_id']);
+    
+        //keep the order in pending status until payment is completed, so we will not update order status here
+        $payment = $order->payments()->create($validatedData);
+        $order->markAsProcessing();
+        
+        //use getKey() to get the primary key of the newly created payment record, which is payment_id in this case, and pass it to the route for showing payment details
+        return redirect()->route('payments.show', $payment->getKey())
                          ->with('success', 'Payment created successfully.');
     }
 
@@ -55,7 +61,7 @@ class PaymentController extends Controller
      */
     public function show(string $id)
     {
-        $payment = Payment::where('pay_id', $id)
+        $payment = Payment::where('payment_id', $id)
             ->whereHas('order', function ($query) {
                 $query->where('user_id', Auth::id());
             })->with('order')->firstOrFail();
@@ -68,7 +74,7 @@ class PaymentController extends Controller
      */
     public function edit(string $id)
     {
-        $payment = Payment::where('pay_id', $id)
+        $payment = Payment::where('payment_id', $id)
             ->whereHas('order', function ($query) {
                 $query->where('user_id', Auth::id());
             })->with('order')->firstOrFail();
@@ -81,7 +87,7 @@ class PaymentController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $payment = Payment::where('pay_id', $id)
+        $payment = Payment::where('payment_id', $id)
             ->whereHas('order', function ($query) {
                 $query->where('user_id', Auth::id());
             })->with('order')->firstOrFail();

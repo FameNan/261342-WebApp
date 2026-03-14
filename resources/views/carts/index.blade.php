@@ -72,17 +72,9 @@
 
                     {{-- ปุ่ม checkout --}}
 <div class="p-4 flex justify-end border-t">
-    <form method="POST" action="{{ route('orders.store') }}">
-        @csrf
-        {{-- ✅ ส่ง products จาก cart items --}}
-        @foreach ($cart->items as $item)
-            <input type="hidden" name="products[{{ $loop->index }}][product_id]" value="{{ $item->product_id }}">
-            <input type="hidden" name="products[{{ $loop->index }}][quantity]" value="{{ $item->quantity }}">
-        @endforeach
-        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
-            Order Now
-        </button>
-    </form>
+    <a href="{{ route('orders.confirm') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+        Order Now
+    </a>
 </div>
                 </div>
             @endif

@@ -8,7 +8,7 @@ class Order extends Model
 {
     protected $primaryKey = 'order_id';
 
-    protected $fillable = ['user_id', 'status', 'total_amount', 'order_date'];
+    protected $fillable = ['user_id', 'status', 'payment_status','total_amount', 'order_date'];
 
     protected $casts = [
         'order_date' => 'datetime',
@@ -93,4 +93,16 @@ class Order extends Model
             $item->product->increment('stock_number', $item->quantity);
         }
     }
+    // Mark order as paid
+    public function isPaid(): bool
+{
+    return $this->payments()->where('status', 'paid')->exists();
+}
+// Mark order as cancelled
+public function markAsCancelled()
+{
+    $this->update(['status' => 'cancelled']);
+    return $this;
+}
+
 }
