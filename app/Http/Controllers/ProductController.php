@@ -8,8 +8,7 @@ use App\Models\Tag;
 use Illuminate\Support\Facades\Storage; // import storage facade for handling file uploads
 use App\Models\Wishlist;
 use Illuminate\Support\Facades\Auth; 
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
-use Cloudinary\Cloudinary;
+use Cloudinary\Cloudinary as CloudinaryClient;
 use Cloudinary\Configuration\Configuration;
 class ProductController extends Controller
 {
