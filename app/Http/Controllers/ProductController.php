@@ -8,7 +8,7 @@ use App\Models\Tag;
 use Illuminate\Support\Facades\Storage; // import storage facade for handling file uploads
 use App\Models\Wishlist;
 use Illuminate\Support\Facades\Auth; 
-
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 class ProductController extends Controller
 {
     /**
@@ -67,7 +67,7 @@ class ProductController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $imagePath = cloudinary()->upload($request->file('image')->getRealPath())->getSecurePath();
+            $imagePath = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
             $validatedData['image'] = $imagePath;
         }
 
@@ -117,8 +117,8 @@ class ProductController extends Controller
         // Handle image upload
         if ($request->hasFile('image')) {
             // Delete old image if exists
-            $imagePath = cloudinary()->upload($request->file('image')->getRealPath())->getSecurePath();
-$validatedData['image'] = $imagePath;
+            $imagePath = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+            $validatedData['image'] = $imagePath;
         }
 
         $product->update($validatedData);
