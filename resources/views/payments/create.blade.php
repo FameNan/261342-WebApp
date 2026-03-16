@@ -9,6 +9,11 @@
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white rounded-2xl shadow p-6 space-y-6">
+                @php
+                    $subtotal = $order->items->sum(fn($i) => $i->price_at_purchase * $i->quantity);
+                    $shippingFee = $order->shipping_fee ?? 50; // fallback just in case old orders have null
+                    $grandTotal = $order->total_amount;        // DB truth (should already include shipping)
+                @endphp
 
                 {{-- รายละเอียด order --}}
                 <div>
@@ -40,15 +45,17 @@
                 <div class="border-t pt-4 space-y-2">
                     <div class="flex justify-between text-sm text-gray-500">
                         <span>ยอดสินค้า</span>
-                        <span>฿{{ number_format($order->total_amount, 2) }}</span>
+                        <span>฿{{ number_format($subtotal, 2) }}</span>
                     </div>
+
                     <div class="flex justify-between text-sm text-gray-500">
                         <span>ค่าจัดส่ง</span>
-                        <span>฿50.00</span>
+                        <span>฿{{ number_format($shippingFee, 2) }}</span>
                     </div>
+
                     <div class="flex justify-between font-bold text-lg pt-2 border-t">
                         <span>รวมทั้งหมด</span>
-                        <span class="text-pink-500">฿{{ number_format($order->total_amount, 2) }}</span>
+                        <span class="text-pink-500">฿{{ number_format($grandTotal, 2) }}</span>
                     </div>
                 </div>
 
@@ -57,7 +64,7 @@
                 <form method="POST" action="{{ route('payments.store') }}" class="border-t pt-4 space-y-4">
                     @csrf
                     <input type="hidden" name="order_id" value="{{ $order->order_id }}">
-                    <input type="hidden" name="amount" value="{{ $order->total_amount }}">
+                    <input type="hidden" name="amount" value="{{ $grandTotal }}">
 
                     <div>
                         <label class="block text-sm text-gray-600 mb-1">วิธีชำระเงิน</label>

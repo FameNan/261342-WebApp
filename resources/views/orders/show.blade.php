@@ -28,6 +28,12 @@
                     </span>
                 </div>
 
+                @php
+                    $subtotal = $order->items->sum(fn($i) => $i->price_at_purchase * $i->quantity);
+                    $shippingFee = $order->shipping_fee ?? 50; // เผื่อออเดอร์เก่าที่ยังไม่มีค่า
+                    $grandTotal = $order->total_amount;        // อิงจาก DB (ควรเป็น subtotal + shippingFee)
+                @endphp
+
                 {{-- order items --}}
                 <div class="space-y-4 border-t pt-4">
                     @foreach ($order->items as $item)
@@ -38,7 +44,7 @@
                                     <img src="{{ $item->product->image }}" class="w-16 h-16 object-cover rounded-lg">
                                 @else
                                     <img src="{{ route('product.photo', ['filename' => basename($item->product->image)]) }}" 
-     class="w-20 h-20 object-cover rounded-lg shadow-sm border border-gray-100">
+                                    class="w-20 h-20 object-cover rounded-lg shadow-sm border border-gray-100">
                                 @endif
                             @endif
 
@@ -59,20 +65,25 @@
                 <div class="mt-6 pt-4 border-t space-y-2">
                     <div class="flex justify-between text-sm text-gray-500">
                         <span>ยอดสินค้า</span>
-                        <span>฿{{ number_format($order->items->sum(fn($i) => $i->price_at_purchase * $i->quantity), 2) }}</span>
-                    </div>
-                    <div class="flex justify-between text-sm text-gray-500">
-                        <span>ค่าจัดส่ง</span>
-                        <span>฿50.00</span>
-                    </div>
-                    <div class="flex justify-between font-bold text-lg pt-2 border-t">
-                        <span>รวมทั้งหมด</span>
-                        <span class="text-pink-500">฿{{ number_format($order->total_amount, 2) }}</span>
+                        <span>฿{{ number_format($subtotal, 2) }}</span>
                     </div>
 
+                    <div class="flex justify-between text-sm text-gray-500">
+                        <span>ค่าจัดส่ง</span>
+                        <span>฿{{ number_format($shippingFee, 2) }}</span>
+                    </div>
+
+                    <div class="flex justify-between font-bold text-lg pt-2 border-t">
+                        <span>รวมทั้งหมด</span>
+                        <span class="text-pink-500">฿{{ number_format($grandTotal, 2) }}</span>
+                    </div>
+
+                    {{-- Shipping Address --}}
                     <div class="mt-4 p-4 rounded-2xl border border-gray-100 bg-gray-50">
                         <p class="text-xs tracking-wide text-gray-400 uppercase mb-1">Shipping Address</p>
-                        <p class="font-medium text-gray-800">{{ $order->address }}</p>
+                        <p class="font-medium text-gray-800">
+                            {{ $order->address ?? '-' }}
+                        </p>
                     </div>
                 </div>
 
