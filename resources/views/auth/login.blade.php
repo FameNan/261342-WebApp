@@ -8,7 +8,7 @@
     <div class="animated-border">
         <div class="animated-border-content card card-pad">
             <h1 class="h1 mb-1" style="color: var(--text);">Welcome back!</h1>
-            <p class="muted mb-6">Log in to continue</p>
+            <p class="muted mb-6">Log in to continue 🩷</p>
 
             <form method="POST" action="{{ route('login') }}" class="space-y-4">
                 @csrf
