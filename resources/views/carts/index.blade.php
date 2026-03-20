@@ -1,110 +1,62 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Cart') }}
+        <h2 class="font-semibold text-xl leading-tight" style="color: #db2777;">
+            Process
         </h2>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
 
-            @if (session('success'))
-                <p class="mb-4 text-green-600">{{ session('success') }}</p>
-            @endif
-
-            @if (!$cart || $cart->items->isEmpty())
-                <p class="text-gray-500">Cart is empty</p>
-            @else
-                {{-- ✅ เปลี่ยนจาก dark:bg-gray-800 → bg-white, เพิ่ม border --}}
-                <div class="bg-white shadow-sm border border-gray-200 rounded-2xl overflow-hidden">
-                    <table class="w-full text-left">
-                        {{-- ✅ หัวตาราง: เปลี่ยนจาก dark:bg-gray-700 → bg-gray-50 --}}
-                        <thead class="bg-gray-50 border-b border-gray-200">
-                            <tr>
-                                <th class="p-4 text-sm font-medium text-gray-500">Product</th>
-                                <th class="p-4 text-sm font-medium text-gray-500">Price</th>
-                                <th class="p-4 text-sm font-medium text-gray-500">Quantity</th>
-                                <th class="p-4 text-sm font-medium text-gray-500">Subtotal</th>
-                                <th class="p-4"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($cart->items as $item)
-                                {{-- ✅ border สีอ่อน --}}
-                                <tr class="border-t border-gray-100">
-                                    <td class="p-4 flex items-center gap-3">
-                                        @if (str_starts_with($item->product->image, 'http'))
-                                            <img src="{{ $item->product->image }}" class="w-14 h-14 object-cover rounded-xl">
-                                        @else
-                                            <img src="{{ asset('storage/products/' . $item->product->image) }}" class="w-14 h-14 object-cover rounded-xl">
-                                        @endif
-                                        {{-- ✅ ชื่อสินค้าสีดำ --}}
-                                        <span class="text-gray-800 font-medium">{{ $item->product->name }}</span>
-                                    </td>
-                                    {{-- ✅ ราคาสีเทา --}}
-                                    <td class="p-4 text-gray-600">฿{{ number_format($item->product->price, 2) }}</td>
-                                    <td class="p-4">
-                                        <form method="POST" action="{{ route('carts.update', $item->cart_item_id) }}">
-                                            @csrf
-                                            @method('PATCH')
-                                            {{-- ✅ ปุ่ม +/- สไตล์ light --}}
-                                            <div class="flex border border-gray-200 rounded-lg w-fit bg-white">
-                                                <button type="submit" name="quantity" value="{{ $item->quantity - 1 }}" class="px-3 py-1 text-gray-600 hover:bg-gray-50">-</button>
-                                                <span class="w-12 text-center border-x border-gray-200 py-1 text-gray-800">{{ $item->quantity }}</span>
-                                                <button type="submit" name="quantity" value="{{ $item->quantity + 1 }}" class="px-3 py-1 text-gray-600 hover:bg-gray-50">+</button>
-                                            </div>
-                                        </form>
-                                    </td>
-                                    <td class="p-4 text-gray-800 font-medium">฿{{ number_format($item->product->price * $item->quantity, 2) }}</td>
-                                    <td class="p-4">
-                                        <form method="POST" action="{{ route('carts.destroy', $item->cart_item_id) }}">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-400 hover:text-red-600 text-sm">ลบ</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-
-                    {{-- ✅ Summary section: Price + Shipping แบบรูปที่ 2 --}}
-                    <div class="px-4 pt-4 border-t border-gray-100">
-                        <div class="flex justify-between text-sm text-gray-500 mb-1">
-                            <span>Price</span>
-                            <span>฿{{ number_format($cart->items->sum(fn($item) => $item->product->price * $item->quantity), 2) }}</span>
+                {{-- Orders Card --}}
+                <a href="{{ route('orders.index') }}" style="text-decoration:none;">
+                    <div style="background:white; border: 0.5px solid #f9c0d4; border-radius:16px; padding:32px 24px; display:flex; flex-direction:column; align-items:center; gap:16px; transition:all 0.2s; cursor:pointer;"
+                         onmouseover="this.style.background='#fff0f5'; this.style.borderColor='#f48fb1';"
+                         onmouseout="this.style.background='white'; this.style.borderColor='#f9c0d4';">
+                        <div style="width:64px; height:64px; border-radius:16px; background:#fce7f3; display:flex; align-items:center; justify-content:center;">
+                            <svg width="32" height="32" fill="none" stroke="#db2777" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <line x1="10" y1="9" x2="8" y2="9"/>
+                            </svg>
                         </div>
-                        <div class="flex justify-between text-sm text-gray-500 mb-3">
-                            <span>Shipping Fee</span>
-                            <span>฿50.00</span>
+                        <div style="text-align:center;">
+                            <p style="font-size:16px; font-weight:500; color:#72243E; margin:0 0 4px;">Orders</p>
+                            <p style="font-size:13px; color:#c084a0; margin:0;">ดูรายการสั่งซื้อ</p>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:4px; color:#db2777; font-size:13px; font-weight:500;">
+                            ดูทั้งหมด
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
                         </div>
                     </div>
+                </a>
 
-                    {{-- ✅ Total: สีชมพู แบบรูปที่ 2 --}}
-                    <div class="px-4 pb-4 flex justify-between items-center border-t border-gray-100 pt-3">
-                        <span class="font-bold text-gray-800 text-lg">Total</span>
-                        <span class="text-2xl font-bold text-pink-500">
-                            ฿{{ number_format($cart->items->sum(fn($item) => $item->product->price * $item->quantity) + 50, 2) }}
-                        </span>
+                {{-- Payments Card --}}
+                <a href="{{ route('payments.index') }}" style="text-decoration:none;">
+                    <div style="background:white; border: 0.5px solid #f9c0d4; border-radius:16px; padding:32px 24px; display:flex; flex-direction:column; align-items:center; gap:16px; transition:all 0.2s; cursor:pointer;"
+                         onmouseover="this.style.background='#fff0f5'; this.style.borderColor='#f48fb1';"
+                         onmouseout="this.style.background='white'; this.style.borderColor='#f9c0d4';">
+                        <div style="width:64px; height:64px; border-radius:16px; background:#fce7f3; display:flex; align-items:center; justify-content:center;">
+                            <svg width="32" height="32" fill="none" stroke="#db2777" stroke-width="1.5" viewBox="0 0 24 24">
+                                <rect x="1" y="4" width="22" height="16" rx="2"/>
+                                <line x1="1" y1="10" x2="23" y2="10"/>
+                            </svg>
+                        </div>
+                        <div style="text-align:center;">
+                            <p style="font-size:16px; font-weight:500; color:#72243E; margin:0 0 4px;">Payments</p>
+                            <p style="font-size:13px; color:#c084a0; margin:0;">ดูประวัติการชำระเงิน</p>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:4px; color:#db2777; font-size:13px; font-weight:500;">
+                            ดูทั้งหมด
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+                        </div>
                     </div>
+                </a>
 
-                    {{-- ✅ ปุ่ม Order Now --}}
-                    <div class="p-4 flex justify-end border-t border-gray-100">
-                        <form method="POST" action="{{ route('orders.store') }}">
-                            @csrf
-                            @foreach ($cart->items as $item)
-                                <input type="hidden" name="products[{{ $loop->index }}][product_id]" value="{{ $item->product_id }}">
-                                <input type="hidden" name="products[{{ $loop->index }}][quantity]" value="{{ $item->quantity }}">
-                            @endforeach
-                            <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 font-medium">
-                                Order Now
-                            </button>
-                        </form>
-                    </div>
-
-                </div>
-            @endif
-
+            </div>
         </div>
     </div>
 </x-app-layout>

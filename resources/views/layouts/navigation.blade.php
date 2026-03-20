@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" style="background: #f48fb1; position: sticky; top: 0; z-index: 50;">
+<nav x-data="{ open: false, processOpen: false }" style="background: #f48fb1; position: sticky; top: 0; z-index: 50;">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
 
@@ -6,12 +6,20 @@
             <div class="flex items-center gap-8">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-2 shrink-0">
                     <div style="width:42px; height:42px; border-radius:50%; overflow:hidden; border: 2px solid rgba(255,255,255,0.6); flex-shrink:0;">
-                        <img src="{{ asset('images/stellar.jpg') }}" alt="Stellar Logo" style="width:100%; height:100%; object-fit:cover;">
+                         <img src="/images/IMG_8006.png" alt="Stellar Cart" style="width:100%; height:100%; object-fit:cover;">
                     </div>
                 </a>
 
                 {{-- DESKTOP MENU --}}
                 <div class="hidden sm:flex items-center gap-1">
+
+                    {{-- Dashboard --}}
+                    <a href="{{ route('dashboard') }}"
+                       style="display:flex; align-items:center; gap:6px; padding:8px 14px; border-radius:10px; font-size:14px; font-weight:500; text-decoration:none; transition: all 0.2s;
+                       {{ request()->routeIs('dashboard') ? 'background:rgba(255,255,255,0.25); color:white;' : 'color:white;' }}">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                        Dashboard
+                    </a>
 
                     {{-- Admin --}}
                     @auth
@@ -33,22 +41,6 @@
                         Products
                     </a>
 
-                    {{-- Orders --}}
-                    <a href="{{ route('orders.index') }}"
-                       style="display:flex; align-items:center; gap:6px; padding:8px 14px; border-radius:10px; font-size:14px; font-weight:500; text-decoration:none; transition: all 0.2s;
-                       {{ request()->routeIs('orders.*') ? 'background:rgba(255,255,255,0.25); color:white;' : 'color:white;' }}">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
-                        Orders
-                    </a>
-
-                    {{-- Payments --}}
-                    <a href="{{ route('payments.index') }}"
-                       style="display:flex; align-items:center; gap:6px; padding:8px 14px; border-radius:10px; font-size:14px; font-weight:500; text-decoration:none; transition: all 0.2s;
-                       {{ request()->routeIs('payments.*') ? 'background:rgba(255,255,255,0.25); color:white;' : 'color:white;' }}">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                        Payments
-                    </a>
-
                     {{-- Wishlist --}}
                     <a href="{{ route('wishlist.index') }}"
                        style="display:flex; align-items:center; gap:6px; padding:8px 14px; border-radius:10px; font-size:14px; font-weight:500; text-decoration:none; transition: all 0.2s;
@@ -60,8 +52,51 @@
                 </div>
             </div>
 
-            {{-- RIGHT SIDE: Cart + Profile --}}
+            {{-- RIGHT SIDE: Process + Cart + Profile --}}
             <div class="hidden sm:flex items-center gap-3">
+
+                {{-- ✅ Process Icon (กล่องเปิด) พร้อม dropdown --}}
+                <div style="position:relative;">
+                    <button @click="processOpen = !processOpen" @click.away="processOpen = false"
+                            style="position:relative; display:flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:10px; background:{{ request()->routeIs('process') ? 'rgba(255,255,255,0.25)' : 'transparent' }}; border:none; cursor:pointer;">
+                        {{-- icon กล่องเปิด --}}
+                        <svg width="22" height="22" fill="none" stroke="white" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path d="M21 8V21H3V8"/>
+                            <path d="M23 3H1v5h22V3z"/>
+                            <path d="M10 12h4"/>
+                        </svg>
+                    </button>
+
+                    {{-- Dropdown menu --}}
+                    <div x-show="processOpen"
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-95"
+                         style="position:absolute; right:0; top:48px; width:180px; background:white; border-radius:14px; border:0.5px solid #f9c0d4; overflow:hidden; z-index:100;">
+
+                        <a href="{{ route('orders.index') }}"
+                           style="display:flex; align-items:center; gap:10px; padding:12px 16px; text-decoration:none; color:#72243E; font-size:14px; transition:background 0.15s;"
+                           onmouseover="this.style.background='#fff0f5'"
+                           onmouseout="this.style.background='white'">
+                            <svg width="16" height="16" fill="none" stroke="#db2777" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            Orders
+                        </a>
+
+                        <div style="height:0.5px; background:#fce7f3; margin:0 12px;"></div>
+
+                        <a href="{{ route('payments.index') }}"
+                           style="display:flex; align-items:center; gap:10px; padding:12px 16px; text-decoration:none; color:#72243E; font-size:14px; transition:background 0.15s;"
+                           onmouseover="this.style.background='#fff0f5'"
+                           onmouseout="this.style.background='white'">
+                            <svg width="16" height="16" fill="none" stroke="#db2777" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                            Payments
+                        </a>
+
+                    </div>
+                </div>
 
                 {{-- Cart Badge --}}
                 <a href="{{ route('carts.index') }}" style="position:relative; display:flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:10px; text-decoration:none; transition:all 0.2s;
@@ -84,12 +119,10 @@
                     <x-slot name="trigger">
                         <button style="display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:10px; border:none; background:rgba(255,255,255,0.15); cursor:pointer; transition:all 0.2s;">
                             @auth
-                                {{-- ✅ แสดงรูป profile ถ้ามี ถ้าไม่มีแสดงตัวอักษรแรก --}}
                                 @if(auth()->user()->profile_photo)
                                     <div style="width:32px; height:32px; border-radius:50%; overflow:hidden; flex-shrink:0;">
                                         <img src="{{ route('user.photo', ['filename' => auth()->user()->profile_photo]) }}"
-                                             style="width:100%; height:100%; object-fit:cover;"
-                                             alt="profile">
+                                             style="width:100%; height:100%; object-fit:cover;" alt="profile">
                                     </div>
                                 @else
                                     <div style="width:32px; height:32px; border-radius:50%; background:#f9a8d4; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; color:white;">
@@ -133,12 +166,10 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden" style="border-top: 1px solid rgba(255,182,193,0.3); padding: 12px 16px;">
         @auth
             <div style="display:flex; align-items:center; gap:10px; padding:10px 0; margin-bottom:8px; border-bottom: 1px solid rgba(255,182,193,0.2);">
-                {{-- ✅ Mobile avatar ก็แสดงรูป profile เหมือนกัน --}}
                 @if(auth()->user()->profile_photo)
                     <div style="width:36px; height:36px; border-radius:50%; overflow:hidden; flex-shrink:0;">
                         <img src="{{ route('user.photo', ['filename' => auth()->user()->profile_photo]) }}"
-                             style="width:100%; height:100%; object-fit:cover;"
-                             alt="profile">
+                             style="width:100%; height:100%; object-fit:cover;" alt="profile">
                     </div>
                 @else
                     <div style="width:36px; height:36px; border-radius:50%; background:#f9a8d4; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; color:white;">
@@ -152,7 +183,7 @@
             </div>
         @endauth
 
-        <!-- remove dashboard blade -->
+        <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">🏠 Dashboard</x-responsive-nav-link>
         <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.index')">🛍️ Products</x-responsive-nav-link>
         <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">📄 Orders</x-responsive-nav-link>
         <x-responsive-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">💳 Payments</x-responsive-nav-link>

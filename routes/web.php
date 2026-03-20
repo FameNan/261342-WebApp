@@ -34,7 +34,6 @@ Route::get('/product-photo/{filename}', function ($filename) {
     return Response::make($file, 200)->header("Content-Type", $type);
 })->name('product.photo');
 
-// ส่ง products ไปให้ dashboard
 Route::get('/dashboard', function () {
     $products = \App\Models\Product::latest()->get();
     return view('dashboard', compact('products'));
@@ -46,6 +45,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::patch('/profile/photo/update', [UserController::class, 'updateProfilePhoto'])->name('profile.photo.update');
     Route::get('/profile/photo/{filename}', [UserController::class, 'showProfilePhoto'])->where('filename', '.*')->name('user.photo');
+
+    // ✅ Process
+    Route::get('/process', fn() => view('process.index'))->name('process.index');
 
     // Cart
     Route::get('/carts', [CartController::class, 'index'])->name('carts.index');
