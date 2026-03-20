@@ -9,9 +9,9 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\AdminController;
-//for call pic from storage
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -23,23 +23,21 @@ Route::get('/upload-images', function () {
     $files = glob(storage_path('app/public/products/*'));
     return response()->json(['files' => $files, 'count' => count($files)]);
 });
-//call picture
-Route::get('/product-photo/{filename}', function ($filename) {
-    // กำหนด path ที่เก็บรูปสินค้า (ตรวจสอบว่าในเครื่องเก็บไว้ที่ไหน)
-    $path = 'products/' . $filename;
 
+Route::get('/product-photo/{filename}', function ($filename) {
+    $path = 'products/' . $filename;
     if (!Storage::disk('public')->exists($path)) {
         abort(404);
     }
-
     $file = Storage::disk('public')->get($path);
     $type = Storage::disk('public')->mimeType($path);
-
     return Response::make($file, 200)->header("Content-Type", $type);
 })->name('product.photo');
 
+// ส่ง products ไปให้ dashboard
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $products = \App\Models\Product::latest()->get();
+    return view('dashboard', compact('products'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -47,10 +45,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::patch('/profile/photo/update', [UserController::class, 'updateProfilePhoto'])->name('profile.photo.update');
-    Route::get('/profile/photo/{filename}', [UserController::class, 'showProfilePhoto'])->where('filename', '.*')->name('user.photo'); //to read
-   
-    
-     // Cart
+    Route::get('/profile/photo/{filename}', [UserController::class, 'showProfilePhoto'])->where('filename', '.*')->name('user.photo');
+
+    // Cart
     Route::get('/carts', [CartController::class, 'index'])->name('carts.index');
     Route::post('/carts', [CartController::class, 'store'])->name('carts.store');
     Route::patch('/carts/{id}', [CartController::class, 'update'])->name('carts.update');
@@ -68,18 +65,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders/{id}/edit', [OrderController::class, 'edit'])->name('orders.edit');
     Route::patch('/orders/{id}', [OrderController::class, 'update'])->name('orders.update');
 
-  // Payments
-Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
-Route::get('/payments/create/{order_id}', [PaymentController::class, 'create'])->name('payments.create');
-Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
-Route::get('/payments/{id}', [PaymentController::class, 'show'])->name('payments.show');
-//wishlist
-Route::get('/wishlists', [WishlistController::class, 'index'])->name('wishlist.index');
-Route::post('/wishlists', [WishlistController::class, 'store'])->name('wishlist.store');
-//when user click the wishlist button, it will toggle the wishlist status of the product
-Route::post('/wishlists/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
-Route::delete('/wishlists/{wishlist}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
-    
+    // Payments
+    Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+    Route::get('/payments/create/{order_id}', [PaymentController::class, 'create'])->name('payments.create');
+    Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
+    Route::get('/payments/{id}', [PaymentController::class, 'show'])->name('payments.show');
+
+    // Wishlist
+    Route::get('/wishlists', [WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlists', [WishlistController::class, 'store'])->name('wishlist.store');
+    Route::post('/wishlists/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+    Route::delete('/wishlists/{wishlist}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
@@ -92,8 +88,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/products/{id}/edit', [ProductController::class, 'edit'])->name('products.edit');
     Route::patch('/products/{id}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{id}', [AdminController::class, 'destroyProduct'])->name('admin.products.destroy');
-    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create'); 
-    Route::post('/products', [ProductController::class, 'store'])->name('products.store'); 
+    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
+    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
     Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders');
     Route::patch('/orders/{id}/packing', [AdminController::class, 'markAsPacking'])->name('admin.orders.packing');
     Route::patch('/orders/{id}/delivering', [AdminController::class, 'markAsDelivering'])->name('admin.orders.delivering');
@@ -101,4 +97,5 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::patch('/orders/{id}/processing', [AdminController::class, 'markAsProcessing'])->name('admin.orders.processing');
     Route::patch('/orders/{id}/status', [AdminController::class, 'updateStatus'])->name('admin.orders.updateStatus');
 });
+
 require __DIR__.'/auth.php';
