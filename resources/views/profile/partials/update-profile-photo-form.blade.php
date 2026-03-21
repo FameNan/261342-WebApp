@@ -61,7 +61,7 @@
     <div class="mt-6">
         <x-input-label for="current_photo" :value="__('Current Profile Photo')" />
         <div class="mt-1">
-            <img src="{{ route('user.photo', ['filename' => $user->image]) }}"
+            <img src="{{ $user->image }}"
                  alt="Profile Photo"
                  class="w-32 h-32 object-cover rounded-full" />
         </div>

@@ -83,7 +83,7 @@
                               
                                 <div style="width:32px; height:32px; border-radius:50%; overflow:hidden; flex-shrink:0;">
     @if(auth()->user()->image)
-        <img src="{{ route('user.photo', ['filename' => auth()->user()->image]) }}"
+        <img src="{{ auth()->user()->image }}"
              style="width:100%; height:100%; object-fit:cover;">
     @else
         {{-- fallback to first letter if no photo --}}

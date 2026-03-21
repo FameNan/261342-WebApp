@@ -27,10 +27,14 @@
                 {{-- Avatar & Info --}}
                 <div class="flex items-center gap-4">
                     <div class="relative">
-                        <div class="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-inner"
-                             style="background: linear-gradient(135deg, var(--accent), var(--secondary));">
-                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                        </div>
+                        @if(auth()->user()->image)
+    <img src="{{ auth()->user()->image }}" class="w-16 h-16 rounded-full object-cover shadow-inner">
+@else
+    <div class="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-inner"
+         style="background: linear-gradient(135deg, var(--accent), var(--secondary));">
+        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+    </div>
+@endif
                     </div>
                     <div>
                         <h3 class="text-lg font-bold text-gray-800">Welcome back, {{ auth()->user()->name }}! 👋</h3>
