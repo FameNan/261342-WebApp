@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\SellerForm;
 use Illuminate\Support\Facades\Auth; 
 use Illuminate\Support\Facades\DB;   
 class AdminController extends Controller
@@ -17,19 +18,16 @@ class AdminController extends Controller
         $totalProducts = Product::count();
         $totalOrders   = Order::count();
         $totalRevenue  = Payment::where('status', 'paid')->sum('amount');
-
-        return view('admin.index', compact(
-            'totalUsers',
-            'totalProducts', 
-            'totalOrders',
-            'totalRevenue'
-        ));
+        return view('admin.index', compact('totalUsers', 'totalProducts', 'totalOrders', 'totalRevenue'));
     }
 
     public function users()
     {
         $users = User::latest()->get();
-        return view('admin.users', compact('users'));
+
+        $pendingRequests = \App\Models\SellerForm::with('user')->where('status', 'pending')->latest()->get();
+
+        return view('admin.users', compact('users', 'pendingRequests'));
     }
 
     public function orders()
@@ -129,35 +127,69 @@ public function updateStatus(Request $request, $id)
         return back()->with('success', "Order updated to {$newStatus}.");
     });
 }
-public function updateRole($id)
-{
-    $user = User::findOrFail($id);
 
-    
+// update user role (admin <-> customer)
+public function updateRole($id)
+    {
+        $user = User::findOrFail($id);
+
     if ($user->id === Auth::id()) {
         return back()->with('error', 'You cannot change your own role!');
     }
 
-    
-    $user->role = ($user->role === 'admin') ? 'customer' : 'admin';
+    $roles = ['customer', 'seller', 'admin'];
+    $currentIndex = array_search($user->role, $roles);
+    $user->role = $roles[($currentIndex + 1) % count($roles)];
     $user->save();
 
-    return back()->with('success', "Updated {$user->name}'s role successfully.");
-}
-
-public function destroy($id)
-{
-    $user = User::findOrFail($id);
-
-    // เช็คว่ามี Order ค้างอยู่ไหม ถ้ามีไม่แนะนำให้ลบ (หรือจะใช้ SoftDelete ก็ได้)
-    if ($user->orders()->count() > 0) {
-        return back()->with('error', 'Cannot delete user with order history.');
+    return back()->with('success', "Updated {$user->name}'s role to {$user->role} successfully.");
     }
 
-    $user->delete();
-    return back()->with('success', 'User removed successfully.');
-}
-//create new admin
+public function destroy($id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->orders()->count() > 0) {
+            return back()->with('error', 'Cannot delete user with order history.');
+        }
+
+        $user->delete();
+        return back()->with('success', 'User removed successfully.');
+    }
+
+    
+//create new admin from admin dashboard (optional)
+
+//using Seller
+public function approveSeller($id)
+    {
+        // use transaction for security of data (update 2 table at once -- seller_requests + users)
+        return DB::transaction(function () use ($id) {
+            $request = SellerForm::findOrFail($id);
+            
+            // 1. อัปเดตสถานะฟอร์มว่าผ่านการอนุมัติแล้ว
+            $request->status = 'approved';
+            $request->save();
+
+            // 🌟 2. อัปเดต Role ของ User (แก้มาใช้แบบกำหนดค่าตรงๆ แล้วค่อย save)
+            $user = $request->user;
+            $user->role = 'admin';
+            $user->save(); 
+
+            return back()->with('success', "Approved seller request for {$user->name}!");
+        });
+    }
+
+    // in case admin want to reject the request (optional)
+    public function rejectSeller($id)
+    {
+        $request = SellerForm::findOrFail($id);
+        $request->update(['status' => 'rejected']);
+
+        return back()->with('sorry', "Rejected request for {$request->user->name}! please try again later or contact support for more info.");
+    }
+
+    // in case admin want to create new admin by himself (optional)
 public function storeAdmin(Request $request)
 {
     $request->validate([
@@ -176,4 +208,3 @@ public function storeAdmin(Request $request)
     return back()->with('success', 'Create new admin successfully!');
 }
 }
-

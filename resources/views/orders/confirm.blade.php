@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('ยืนยันคำสั่งซื้อ') }}
+            {{ __('Confirm Order') }}
         </h2>
     </x-slot>
 
@@ -16,6 +16,8 @@
                 } else {
                     $subtotal = $cart->items->sum(fn($i) => $i->product->price * $i->quantity);
                 }
+                $displayItems = (isset($is_buy_now) && $is_buy_now) ? $items : $cart->items;
+                $subtotal = $displayItems->sum(fn($i) => ($i['product'] ?? $i->product)->price * ($i['quantity'] ?? $i->quantity));
                 $grandTotal = $subtotal + $shippingFee;
             @endphp
 
@@ -39,8 +41,7 @@
 
                         <div>
                             <label class="block text-sm text-gray-600 mb-1">Full Name</label>
-                            <input type="text" name="name"
-                                value="{{ old('name', Auth::user()->name) }}"
+                            <input type="text" name="name" value="{{ old('name', Auth::user()->name) }}"
                                 class="w-full border rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
                             @error('name') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
@@ -55,8 +56,7 @@
 
                         <div>
                             <label class="block text-sm text-gray-600 mb-1">Telephone Number</label>
-                            <input type="text" name="phone"
-                                value="{{ old('phone', Auth::user()->phone_number) }}"
+                            <input type="text" name="phone" value="{{ old('phone', Auth::user()->phone_number) }}"
                                 class="w-full border rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
                             @error('phone') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
@@ -65,10 +65,10 @@
                             <label class="block text-sm text-gray-600 mb-1">Payment Method</label>
                             <select name="payment_method"
                                 class="w-full border rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
-                                <option value="promptpay" {{ old('payment_method') == 'promptpay' ? 'selected' : '' }}>PromptPay</option>
-                                <option value="credit_card" {{ old('payment_method') == 'credit_card' ? 'selected' : '' }}>บัตรเครดิต</option>
-                                <option value="bank_transfer" {{ old('payment_method') == 'bank_transfer' ? 'selected' : '' }}>โอนเงิน</option>
-                                <option value="cash_on_delivery" {{ old('payment_method') == 'cash_on_delivery' ? 'selected' : '' }}>เก็บเงินปลายทาง</option>
+                                <option value="promptpay">PromptPay</option>
+                                <option value="credit_card">Credit Card</option>
+                                <option value="bank_transfer">Bank Transfer</option>
+                                <option value="cash_on_delivery">Cash on Delivery</option>
                             </select>
                             @error('payment_method') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
@@ -83,6 +83,10 @@
                         @endphp
 
                         @foreach($displayItems as $item)
+                            @php
+                                $product = $item['product'] ?? $item->product;
+                                $qty = $item['quantity'] ?? $item->quantity;
+                            @endphp
                             <div class="flex items-center gap-4">
                                 @php $product = $item['product'] ?? $item->product; @endphp
                                 @if(str_starts_with($product->image ?? '', 'http'))
@@ -96,6 +100,17 @@
                                     <p class="text-sm text-gray-500">฿{{ number_format($product->price, 2) }} x {{ $item['quantity'] ?? $item->quantity }}</p>
                                 </div>
                                 <p class="font-semibold">฿{{ number_format($product->price * ($item['quantity'] ?? $item->quantity), 2) }}</p>
+                                @if(str_starts_with($product->image, 'http'))
+                                    <img src="{{ $product->image }}" class="w-16 h-16 object-cover rounded-lg">
+                                @else
+                                    <img src="{{ route('product.photo', ['filename' => basename($product->image)]) }}"
+                                         class="w-16 h-16 object-cover rounded-lg shadow-sm border border-gray-100">
+                                @endif
+                                <div class="flex-1">
+                                    <p class="font-medium">{{ $product->name }}</p>
+                                    <p class="text-sm text-gray-500">฿{{ number_format($product->price, 2) }} x {{ $qty }}</p>
+                                </div>
+                                <p class="font-semibold">฿{{ number_format($product->price * $qty, 2) }}</p>
                             </div>
                         @endforeach
                     </div>

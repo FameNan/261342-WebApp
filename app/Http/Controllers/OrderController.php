@@ -173,18 +173,7 @@ public function storeNow(Request $request)
     return redirect()->route('orders.confirm', [ 'product_id' => $request->product_id,
         'quantity'   => $request->quantity,]);
 }
-// For "Buy Now" functionality, we can create a separate method that creates an order directly from a single product without going through the cart.
-public function storeNow(Request $request)
-{
-    $validated = $request->validate([
-        'product_id' => 'required|exists:products,product_id',
-        'quantity'   => 'required|integer|min:1',
-    ]);
 
-    
-    return redirect()->route('orders.confirm', [ 'product_id' => $request->product_id,
-        'quantity'   => $request->quantity,]);
-}
 //need confirm order page before store order, to show order summary and confirm before place order
 public function confirm(Request $request) 
 {
