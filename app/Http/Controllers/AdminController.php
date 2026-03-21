@@ -133,14 +133,16 @@ public function updateRole($id)
     {
         $user = User::findOrFail($id);
 
-        if ($user->id === Auth::id()) {
-            return back()->with('error', 'You cannot change your own role!');
-        }
+    if ($user->id === Auth::id()) {
+        return back()->with('error', 'You cannot change your own role!');
+    }
 
-        $user->role = ($user->role === 'admin') ? 'customer' : 'admin';
-        $user->save();
+    $roles = ['customer', 'seller', 'admin'];
+    $currentIndex = array_search($user->role, $roles);
+    $user->role = $roles[($currentIndex + 1) % count($roles)];
+    $user->save();
 
-        return back()->with('success', "Updated {$user->name}'s role successfully.");
+    return back()->with('success', "Updated {$user->name}'s role to {$user->role} successfully.");
     }
 
 public function destroy($id)

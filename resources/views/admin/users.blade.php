@@ -162,9 +162,10 @@
         {{-- 4. คอลัมน์ Role --}}
         <td class="px-6 py-4">
             <span @class([
-                'px-2 py-1 rounded-full text-[10px] font-bold uppercase',
-                'bg-red-100 text-red-700'   => $user->role === 'admin',
-                'bg-blue-100 text-blue-700' => $user->role === 'customer',
+                 'px-2 py-1 rounded-full text-[10px] font-bold uppercase',
+    'bg-red-100 text-red-700'    => $user->role === 'admin',
+    'bg-blue-100 text-blue-700'  => $user->role === 'customer',
+    'bg-green-100 text-green-700' => $user->role === 'seller',
             ])>
                 {{ $user->role }}
             </span>

@@ -66,4 +66,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Order::class, 'user_id', 'id');
     }
+    //link seller with user id
+    public function sellerProducts()
+{
+    return $this->belongsToMany(Product::class, 'seller_products', 'seller_id', 'product_id');
+}
 }

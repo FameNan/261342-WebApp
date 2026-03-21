@@ -16,6 +16,7 @@ use App\Models\SellerForm;
 use App\Http\Controllers\SellerFormController;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
+use App\Http\Controllers\SellerProductController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -115,10 +116,19 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::patch('/orders/{id}/complete', [AdminController::class, 'markAsComplete'])->name('admin.orders.complete');
     Route::patch('/orders/{id}/processing', [AdminController::class, 'markAsProcessing'])->name('admin.orders.processing');
     Route::patch('/orders/{id}/status', [AdminController::class, 'updateStatus'])->name('admin.orders.updateStatus');
-
     // Seller Requests (Admin approval)
     Route::get('/seller-requests', [AdminController::class, 'sellerRequests'])->name('admin.sellerRequests');
     
+    
 });
 
+Route::middleware(['auth', 'seller'])->prefix('seller')->name('seller.')->group(function () {
+    Route::get('/', [SellerProductController::class, 'index'])->name('index');
+    Route::get('/products', [SellerProductController::class, 'index'])->name('products.index');
+    Route::get('/products/create', [SellerProductController::class, 'create'])->name('products.create');
+    Route::post('/products', [SellerProductController::class, 'store'])->name('products.store');
+    Route::get('/products/{id}/edit', [SellerProductController::class, 'edit'])->name('products.edit');
+    Route::patch('/products/{id}', [SellerProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{id}', [SellerProductController::class, 'destroy'])->name('products.destroy');
+});
 require __DIR__.'/auth.php';

@@ -99,5 +99,9 @@ public function updateBio(Request $request)
     return redirect()->route('profile.show-bio')
                     ->with('status', 'Bio updated successfully!');
 }
-
+//link seller with user id
+    public function sellerProducts()
+{
+    return $this->belongsToMany(Product::class, 'seller_products', 'seller_id', 'product_id');
+}
 }

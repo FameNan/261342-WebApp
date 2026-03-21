@@ -174,4 +174,9 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
     }
+    //sellers can create product
+    public function sellers()
+{
+    return $this->belongsToMany(User::class, 'seller_products', 'product_id', 'seller_id');
+}
 }
