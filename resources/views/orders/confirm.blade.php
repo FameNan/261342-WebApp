@@ -11,15 +11,11 @@
 
             @php
                 $shippingFee = 50;
-
-                if (isset($items)) {
-                    // Buy Now flow
+                if (isset($is_buy_now) && $is_buy_now) {
                     $subtotal = $items->sum(fn($i) => $i['product']->price * $i['quantity']);
                 } else {
-                    // Cart flow
                     $subtotal = $cart->items->sum(fn($i) => $i->product->price * $i->quantity);
                 }
-
                 $grandTotal = $subtotal + $shippingFee;
             @endphp
 
@@ -28,24 +24,9 @@
 
                     {{-- hidden inputs --}}
                     @if(isset($is_buy_now) && $is_buy_now)
-                        {{-- Buy Now --}}
                         <input type="hidden" name="products[0][product_id]" value="{{ $product_id }}">
                         <input type="hidden" name="products[0][quantity]" value="{{ $quantity }}">
                     @else
-                        {{-- Cart --}}
-                        @foreach($cart->items as $item)
-                            <input type="hidden" name="products[{{ $loop->index }}][product_id]" value="{{ $item->product_id }}">
-                            <input type="hidden" name="products[{{ $loop->index }}][quantity]" value="{{ $item->quantity }}">
-                        @endforeach
-                    @endif
-
-                    {{-- hidden inputs --}}
-                    @if(isset($is_buy_now) && $is_buy_now)
-                        {{-- Buy Now --}}
-                        <input type="hidden" name="products[0][product_id]" value="{{ $product_id }}">
-                        <input type="hidden" name="products[0][quantity]" value="{{ $quantity }}">
-                    @else
-                        {{-- Cart --}}
                         @foreach($cart->items as $item)
                             <input type="hidden" name="products[{{ $loop->index }}][product_id]" value="{{ $item->product_id }}">
                             <input type="hidden" name="products[{{ $loop->index }}][quantity]" value="{{ $item->quantity }}">
@@ -71,7 +52,6 @@
                                 placeholder="กรอกที่อยู่จัดส่ง">{{ old('address', Auth::user()->address) }}</textarea>
                             @error('address') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
-
 
                         <div>
                             <label class="block text-sm text-gray-600 mb-1">Telephone Number</label>
@@ -99,48 +79,28 @@
                         <h3 class="font-semibold text-lg">Product List</h3>
 
                         @php
-                            $displayItems = isset($is_buy_now) && $is_buy_now
-                                ? $items
-                                : $cart->items;
+                            $displayItems = isset($is_buy_now) && $is_buy_now ? $items : $cart->items;
                         @endphp
 
                         @foreach($displayItems as $item)
                             <div class="flex items-center gap-4">
                                 @php $product = $item['product'] ?? $item->product; @endphp
-                                @if(str_starts_with($product->image, 'http'))
-                                    <img src="{{ $product->image }}" class="w-16 h-16 object-cover rounded-lg">
-                                @php $product = $item['product'] ?? $item->product; @endphp
-                                @if(str_starts_with($product->image, 'http'))
+                                @if(str_starts_with($product->image ?? '', 'http'))
                                     <img src="{{ $product->image }}" class="w-16 h-16 object-cover rounded-lg">
                                 @else
-                                    <img src="{{ route('product.photo', ['filename' => basename($product->image)]) }}" 
-     class="w-20 h-20 object-cover rounded-lg shadow-sm border border-gray-100">
+                                    <img src="{{ route('product.photo', ['filename' => basename($product->image)]) }}"
+                                         class="w-20 h-20 object-cover rounded-lg shadow-sm border border-gray-100">
                                 @endif
                                 <div class="flex-1">
                                     <p class="font-medium">{{ $product->name }}</p>
                                     <p class="text-sm text-gray-500">฿{{ number_format($product->price, 2) }} x {{ $item['quantity'] ?? $item->quantity }}</p>
-                                    <p class="font-medium">{{ $product->name }}</p>
-                                    <p class="text-sm text-gray-500">฿{{ number_format($product->price, 2) }} x {{ $item['quantity'] ?? $item->quantity }}</p>
                                 </div>
-                                <p class="font-semibold">฿{{ number_format($product->price * ($item['quantity'] ?? $item->quantity), 2) }}</p>
                                 <p class="font-semibold">฿{{ number_format($product->price * ($item['quantity'] ?? $item->quantity), 2) }}</p>
                             </div>
                         @endforeach
                     </div>
 
                     {{-- สรุปราคา --}}
-                    @php
-                        $total = isset($is_buy_now) && $is_buy_now
-                            ? $items->sum(fn($i) => $i['product']->price * $i['quantity'])
-                            : $cart->items->sum(fn($i) => $i->product->price * $i->quantity);
-                    @endphp
-
-                    @php
-                        $total = isset($is_buy_now) && $is_buy_now
-                            ? $items->sum(fn($i) => $i['product']->price * $i['quantity'])
-                            : $cart->items->sum(fn($i) => $i->product->price * $i->quantity);
-                    @endphp
-
                     <div class="border-t pt-4 space-y-2">
                         <div class="flex justify-between text-sm text-gray-500">
                             <span>Price</span>
@@ -159,16 +119,12 @@
                     {{-- ปุ่ม --}}
                     <div class="border-t pt-4 flex justify-between items-center">
                         @if(isset($is_buy_now) && $is_buy_now)
-                            <a href="javascript:history.back()" class="text-sm text-gray-500 hover:underline">
-                                ← Back
-                            </a>
+                            <a href="javascript:history.back()" class="text-sm text-gray-500 hover:underline">← Back</a>
                         @else
-                            <a href="{{ route('carts.index') }}" class="text-sm text-gray-500 hover:underline">
-                                ← Back to Cart
-                            </a>
+                            <a href="{{ route('carts.index') }}" class="text-sm text-gray-500 hover:underline">← Back to Cart</a>
                         @endif
                         <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                            Confirm 
+                            Confirm
                         </button>
                     </div>
 
