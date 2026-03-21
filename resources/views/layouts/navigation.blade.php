@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" style="background: #f48fb1; position: sticky; top: 0; z-index: 50;">
+<nav x-data="{ open: false }" class="sticky top-0 z-50 transition-colors duration-300 bg-secondary">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
 
@@ -85,7 +85,7 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
+                        <x-dropdown-link :href="route('profile.index')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
                         <form method="POST" action="{{ route('logout') }}">
@@ -136,8 +136,9 @@
         <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">📄 Orders</x-responsive-nav-link>
         <x-responsive-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">💳 Payments</x-responsive-nav-link>
         <x-responsive-nav-link :href="route('carts.index')" :active="request()->routeIs('carts.*')">🛒 Cart</x-responsive-nav-link>
-        <x-responsive-nav-link :href="route('wishlist.index')" :active="request()->routeIs('wishlist.*')">⭐ Wishlist</x-responsive-nav-link>
-        <x-responsive-nav-link :href="route('profile.edit')">👤 Profile</x-responsive-nav-link>
+        <x-responsive-nav-link :href="route('wishlist.index')" :active="request()->routeIs('wishlist.*')">🤍 Wishlist</x-responsive-nav-link>
+        <x-responsive-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">👤 Profile</x-responsive-nav-link>
+        <x-responsive-nav-link :href="route('profile.index')" :active="request()->routeIs('profile.index')">👤 Profile</x-responsive-nav-link>
 
         <form method="POST" action="{{ route('logout') }}">
             @csrf
