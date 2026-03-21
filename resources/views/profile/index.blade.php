@@ -17,7 +17,7 @@
             {{-- ปุ่มกลับ --}}
             <div>
                 <a href="{{ route('products.index') }}" class="text-sm font-medium flex items-center gap-2" style="color: var(--secondary);">
-                    <span>←</span> กลับ
+                    <span>←</span> back
                 </a>
             </div>
 
@@ -33,14 +33,14 @@
                         </div>
                     </div>
                     <div>
-                        <h3 class="text-lg font-bold text-gray-800">ยินดีต้อนรับ, {{ auth()->user()->name }}! 👋</h3>
+                        <h3 class="text-lg font-bold text-gray-800">Welcome back, {{ auth()->user()->name }}! 👋</h3>
                         <p class="text-sm text-gray-500 mb-2">{{ auth()->user()->email }}</p>
                         
                         {{-- ปุ่มแก้ไขโปรไฟล์ (ลิงก์ไปหน้า edit.blade.php เดิม) --}}
                         <a href="{{ route('profile.edit') }}" 
                            class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border transition"
                            style="border-color: var(--secondary); color: var(--secondary);">
-                            ✎ แก้ไขโปรไฟล์
+                            ✎ Edit Profile
                         </a>
                     </div>
                 </div>
@@ -48,7 +48,7 @@
                 {{-- Toggle Become Seller --}}
                 <div class="bg-pink-50 rounded-2xl p-3 flex items-center gap-3 sm:mt-0 mt-4 w-full sm:w-auto justify-between">
                     <span class="text-sm font-semibold text-pink-700 flex items-center gap-2">
-                        🏪 เป็นผู้ขาย?
+                        🏪 Want to be Seller?
                     </span>
 
                     @if(auth()->user()->role === 'admin')
@@ -72,8 +72,8 @@
                 <a href="{{ route('wishlist.index') }}" class="bg-white rounded-3xl p-5 shadow-sm border border-pink-50 hover:shadow-md transition text-center flex flex-col items-center justify-center gap-2">
                     <div class="w-10 h-10 rounded-full flex items-center justify-center text-pink-500 bg-pink-50 text-xl">⭐</div>
                     <div>
-                        <p class="font-bold text-gray-800">สินค้าที่ชอบ</p>
-                        <p class="text-xs text-gray-500">รายการโปรดของคุณ</p>
+                        <p class="font-bold text-gray-800">Wish List</p>
+                        <p class="text-xs text-gray-500">Your Favorite</p>
                     </div>
                 </a>
 
@@ -81,8 +81,8 @@
                 <a href="{{ route('carts.index') }}" class="bg-white rounded-3xl p-5 shadow-sm border border-pink-50 hover:shadow-md transition text-center flex flex-col items-center justify-center gap-2">
                     <div class="w-10 h-10 rounded-full flex items-center justify-center text-gray-600 bg-gray-100 text-xl">🛒</div>
                     <div>
-                        <p class="font-bold text-gray-800">ตะกร้าของฉัน</p>
-                        <p class="text-xs text-gray-500">สินค้าในตะกร้า</p>
+                        <p class="font-bold text-gray-800">My cart</p>
+                        <p class="text-xs text-gray-500">Products in cart</p>
                     </div>
                 </a>
 
@@ -90,8 +90,8 @@
                 <a href="{{ route('recentViews.index') }}" class="bg-white rounded-3xl p-5 shadow-sm border border-pink-50 hover:shadow-md transition text-center flex flex-col items-center justify-center gap-2">
                     <div class="w-10 h-10 rounded-full flex items-center justify-center text-yellow-500 bg-yellow-50 text-xl">🕒</div>
                     <div>
-                        <p class="font-bold text-gray-800">สินค้าที่เพิ่งดู</p>
-                        <p class="text-xs text-gray-500">ประวัติการเรียกดู</p>
+                        <p class="font-bold text-gray-800">Latest products you viewed</p>
+                        <p class="text-xs text-gray-500">Recently Viewed Products</p>
                     </div>
                 </a>
 
@@ -99,8 +99,8 @@
                 <a href="{{ route('orders.index') }}" class="bg-white rounded-3xl p-5 shadow-sm border border-pink-50 hover:shadow-md transition text-center flex flex-col items-center justify-center gap-2">
                     <div class="w-10 h-10 rounded-full flex items-center justify-center text-green-500 bg-green-50 text-xl">📦</div>
                     <div>
-                        <p class="font-bold text-gray-800">ประวัติคำสั่งซื้อ</p>
-                        <p class="text-xs text-gray-500">คำสั่งซื้อและสถานะ</p>
+                        <p class="font-bold text-gray-800">Order History</p>
+                        <p class="text-xs text-gray-500">Order and Status</p>
                     </div>
                 </a>
 
@@ -110,7 +110,7 @@
             <form method="POST" action="{{ route('logout') }}" class="mt-6">
                 @csrf
                 <button type="submit" class="w-full bg-white border border-red-400 text-red-500 font-bold py-3 rounded-full hover:bg-red-50 transition flex justify-center items-center gap-2">
-                    <span>[→</span> ออกจากระบบ
+                    <span>[→</span> Log out
                 </button>
             </form>
 
@@ -136,11 +136,11 @@
                             🏪
                         </div>
                         <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-title">
-                            ส่งคำขอเป็นผู้ขาย (Seller)
+                           Request to Become a Seller
                         </h3>
                         <div class="mt-2">
                             <p class="text-sm text-gray-500">
-                                คุณต้องการส่งคำขอไปยัง Admin เพื่อเปิดสิทธิ์การขายสินค้าในระบบใช่หรือไม่?
+                                Would you like to send a request to the admin to become a seller?
                             </p>
                         </div>
                     </div>
@@ -150,13 +150,13 @@
                         {{-- ปุ่มยกเลิก --}}
                         <button type="button" @click="showSellerModal = false" 
                                 class="w-full sm:w-1/2 inline-flex justify-center items-center rounded-full border border-gray-300 shadow-sm px-6 py-2.5 bg-white text-base font-bold text-gray-700 hover:bg-gray-50 transition sm:text-sm">
-                            ยกเลิก
+                            Cancel
                         </button>
 
                         <a href="{{ route('seller.form.create') }}" 
                            class="w-full sm:w-1/2 inline-flex justify-center items-center rounded-full border border-transparent shadow-sm px-6 py-2.5 text-base font-bold text-white hover:opacity-90 transition sm:text-sm m-0" 
                            style="background: var(--primary);">
-                            กรอกข้อมูลเปิดร้าน
+                            Enter Store Details
                         </a>
                         
                     </div>
