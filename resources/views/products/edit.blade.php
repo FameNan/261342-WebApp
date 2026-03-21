@@ -65,7 +65,22 @@
                             class="w-full border rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
                         @error('image') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
-
+                    {{-- Tags --}}
+<div>
+    <label class="block text-sm text-gray-600 mb-2">Tags</label>
+    <div class="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-2 border rounded-xl">
+        @foreach($tags as $tag)
+            <label class="relative inline-flex items-center">
+                <input type="checkbox" name="tags[]" value="{{ $tag->id }}" class="sr-only peer"
+                    {{ $product->tags->contains($tag->id) ? 'checked' : '' }}>
+                <div class="px-3 py-1 text-xs font-semibold rounded-full border border-gray-200 text-gray-500 cursor-pointer
+                    peer-checked:bg-pink-100 peer-checked:text-pink-600 peer-checked:border-pink-300 hover:bg-gray-50 transition-all">
+                    #{{ $tag->name }}
+                </div>
+            </label>
+        @endforeach
+    </div>
+</div>
                     {{-- Button --}}
                     <div class="flex justify-between items-center pt-2">
                         <a href="{{ route('admin.products') }}" class="text-sm text-gray-500 hover:underline">

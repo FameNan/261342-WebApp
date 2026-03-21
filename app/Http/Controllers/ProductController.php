@@ -103,8 +103,10 @@ $categories = Tag::whereHas('products', function ($q) use ($mode, $secondhandTag
     $validatedData['image'] = $result['secure_url'];
 }
 
-        Product::create($validatedData);
-
+       $product = Product::create($validatedData);
+if ($request->has('tags')) {
+    $product->tags()->sync($request->tags);
+}
         return redirect()->route('products.index')->with('success', 'Product created successfully.');
     }
 
@@ -135,7 +137,8 @@ $categories = Tag::whereHas('products', function ($q) use ($mode, $secondhandTag
     public function edit(string $id) //adding edit product method
     {
         $product = Product::where('product_id', $id)->firstOrFail();
-        return view('products.edit', compact('product'));
+        $tags = Tag::all();
+        return view('products.edit', compact('product','tags'));
     }
 
     /**
@@ -161,6 +164,11 @@ $categories = Tag::whereHas('products', function ($q) use ($mode, $secondhandTag
 }
 
         $product->update($validatedData);
+        if ($request->has('tags')) {
+    $product->tags()->sync($request->tags);
+} else {
+    $product->tags()->detach();
+}
 
         return redirect()->route('admin.products')->with('success', 'Product updated successfully.');
     }
