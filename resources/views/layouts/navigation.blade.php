@@ -1,4 +1,4 @@
-<nav x-data="{ open: false, processOpen: false }" style="background: #f48fb1; position: sticky; top: 0; z-index: 50;">
+<nav x-data="{ open: false }" style="background: #f48fb1; position: sticky; top: 0; z-index: 50;">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
 
@@ -12,14 +12,6 @@
 
                 {{-- DESKTOP MENU --}}
                 <div class="hidden sm:flex items-center gap-1">
-
-                    {{-- Dashboard --}}
-                    <a href="{{ route('dashboard') }}"
-                       style="display:flex; align-items:center; gap:6px; padding:8px 14px; border-radius:10px; font-size:14px; font-weight:500; text-decoration:none; transition: all 0.2s;
-                       {{ request()->routeIs('dashboard') ? 'background:rgba(255,255,255,0.25); color:white;' : 'color:white;' }}">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                        Dashboard
-                    </a>
 
                     {{-- Admin --}}
                     @auth
@@ -41,65 +33,22 @@
                         Products
                     </a>
 
-                    {{-- Wishlist --}}
-                    <a href="{{ route('wishlist.index') }}"
-                       style="display:flex; align-items:center; gap:6px; padding:8px 14px; border-radius:10px; font-size:14px; font-weight:500; text-decoration:none; transition: all 0.2s;
-                       {{ request()->routeIs('wishlist.*') ? 'background:rgba(255,255,255,0.25); color:white;' : 'color:white;' }}">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg>
-                        Wishlist
-                    </a>
-
                 </div>
             </div>
 
-            {{-- RIGHT SIDE: Process + Cart + Profile --}}
+            {{-- RIGHT SIDE: Wishlist + Cart + Profile --}}
             <div class="hidden sm:flex items-center gap-3">
 
-                {{-- ✅ Process Icon (กล่องเปิด) พร้อม dropdown --}}
-                <div style="position:relative;">
-                    <button @click="processOpen = !processOpen" @click.away="processOpen = false"
-                            style="position:relative; display:flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:10px; background:{{ request()->routeIs('process') ? 'rgba(255,255,255,0.25)' : 'transparent' }}; border:none; cursor:pointer;">
-                        {{-- icon กล่องเปิด --}}
-                        <svg width="22" height="22" fill="none" stroke="white" stroke-width="1.8" viewBox="0 0 24 24">
-                            <path d="M21 8V21H3V8"/>
-                            <path d="M23 3H1v5h22V3z"/>
-                            <path d="M10 12h4"/>
-                        </svg>
-                    </button>
-
-                    {{-- Dropdown menu --}}
-                    <div x-show="processOpen"
-                         x-transition:enter="transition ease-out duration-150"
-                         x-transition:enter-start="opacity-0 scale-95"
-                         x-transition:enter-end="opacity-100 scale-100"
-                         x-transition:leave="transition ease-in duration-100"
-                         x-transition:leave-start="opacity-100 scale-100"
-                         x-transition:leave-end="opacity-0 scale-95"
-                         style="position:absolute; right:0; top:48px; width:180px; background:white; border-radius:14px; border:0.5px solid #f9c0d4; overflow:hidden; z-index:100;">
-
-                        <a href="{{ route('orders.index') }}"
-                           style="display:flex; align-items:center; gap:10px; padding:12px 16px; text-decoration:none; color:#72243E; font-size:14px; transition:background 0.15s;"
-                           onmouseover="this.style.background='#fff0f5'"
-                           onmouseout="this.style.background='white'">
-                            <svg width="16" height="16" fill="none" stroke="#db2777" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                            Orders
-                        </a>
-
-                        <div style="height:0.5px; background:#fce7f3; margin:0 12px;"></div>
-
-                        <a href="{{ route('payments.index') }}"
-                           style="display:flex; align-items:center; gap:10px; padding:12px 16px; text-decoration:none; color:#72243E; font-size:14px; transition:background 0.15s;"
-                           onmouseover="this.style.background='#fff0f5'"
-                           onmouseout="this.style.background='white'">
-                            <svg width="16" height="16" fill="none" stroke="#db2777" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                            Payments
-                        </a>
-
-                    </div>
-                </div>
+                {{-- ⭐ Wishlist Icon (ดาวสีเหลือง) --}}
+                <a href="{{ route('wishlist.index') }}" style="position:relative; display:flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:10px; text-decoration:none; transition:all 0.2s;
+                {{ request()->routeIs('wishlist.*') ? 'background:rgba(255,255,255,0.25);' : '' }}">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="#facc15" stroke="#f59e0b" stroke-width="1.5">
+                        <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                    </svg>
+                </a>
 
                 {{-- Cart Badge --}}
-                <a href="{{ route('carts.index') }}" style="position:relative; display:flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:10px; text-decoration:none; transition:all 0.2s;
+                <a href="{{ route('carts.index') }}" style="position:relative; display:flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:10px; text-decoration:none; transition:all 0.2s; color:white;
                 {{ request()->routeIs('carts.*') ? 'background:rgba(255,255,255,0.25);' : '' }}">
                     <svg width="20" height="20" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/><circle cx="10" cy="20.5" r="1.5"/><circle cx="18.5" cy="20.5" r="1.5"/></svg>
                     @auth
@@ -183,12 +132,11 @@
             </div>
         @endauth
 
-        <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">🏠 Dashboard</x-responsive-nav-link>
         <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.index')">🛍️ Products</x-responsive-nav-link>
         <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">📄 Orders</x-responsive-nav-link>
         <x-responsive-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">💳 Payments</x-responsive-nav-link>
         <x-responsive-nav-link :href="route('carts.index')" :active="request()->routeIs('carts.*')">🛒 Cart</x-responsive-nav-link>
-        <x-responsive-nav-link :href="route('wishlist.index')" :active="request()->routeIs('wishlist.*')">🤍 Wishlist</x-responsive-nav-link>
+        <x-responsive-nav-link :href="route('wishlist.index')" :active="request()->routeIs('wishlist.*')">⭐ Wishlist</x-responsive-nav-link>
         <x-responsive-nav-link :href="route('profile.edit')">👤 Profile</x-responsive-nav-link>
 
         <form method="POST" action="{{ route('logout') }}">
