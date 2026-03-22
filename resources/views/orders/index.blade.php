@@ -77,7 +77,8 @@
                     {{-- ปุ่ม --}}
                     <div class="mt-4 flex justify-end">
                         <a href="{{ route('orders.show', $order->order_id) }}"
-                           class="text-sm text-blue-600 hover:underline">
+                           class="text-sm hover:underline"
+                           style="color:var(--secondary)">
                             For more information →
                         </a>
                     </div>
