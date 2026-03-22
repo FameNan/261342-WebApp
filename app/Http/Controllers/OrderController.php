@@ -60,6 +60,7 @@ class OrderController extends Controller
                 throw new \Exception("Stock not enough for {$product->name}");
             }
         }
+        
         $total = collect($validated['products'])->sum(
             fn($item) => $products[$item['product_id']]->price * $item['quantity']
         );
@@ -302,24 +303,8 @@ public function confirm(Request $request)
             'payment_date' => now(),
         ]);
     }
-     // update old  payment record instead of creating new one.
-    $payment = $order->payments()->where('status', 'unpaid')->first();
-    
-    if ($payment) {
-        $payment->update([
-            'status'       => 'paid',
-            'method'       => 'manual',
-            'payment_date' => now(),
-        ]);
-    } else {
-        $order->payments()->create([
-            'status'       => 'paid',
-            'method'       => 'manual',
-            'amount'       => $order->total_amount,
-            'payment_date' => now(),
-        ]);
-    }
-
+     
+    $order->update(['payment_status' => 'paid']);
     $order->markAsProcessing();
 
     return redirect()->route('orders.show', $order->order_id)
