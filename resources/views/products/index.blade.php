@@ -2,13 +2,6 @@
 
     <div class="page-wrap">
         <div class="container">
-            {{-- Description Card --}}
-            <div class="card card-pad mb-8" style="border-left: 4px solid var(--secondary);">
-                <p class="muted mb-0">
-                    {{ ($mode ?? 'online') === 'Secondhand/2nd hand' ? 'Explore our curated selection of pre-loved treasures, from vintage finds to gently used gems. Shop sustainably and discover unique items with character.' : 'Browse our collection of new products, carefully curated for quality and style. Find the perfect item that suits your needs and preferences.' }}
-                </p>
-            </div>
-
             {{-- Mode Toggle --}}
             <div class="flex justify-center mb-10">
                 <div class="inline-flex rounded-full p-1 backdrop-blur-sm" style="background: rgba(158, 131, 131, 0.08); border: 1px solid rgba(158, 131, 131, 0.1);">
@@ -24,6 +17,14 @@
                     </a>
                 </div>
             </div>
+            
+            {{-- Description Card --}}
+            <div class="card card-pad mb-8" style="border-left: 4px solid var(--secondary);">
+                <p class="muted mb-0">
+                    {{ ($mode ?? 'online') === 'Secondhand/2nd hand' ? 'Explore our curated selection of pre-loved treasures, from vintage finds to gently used gems. Shop sustainably and discover unique items with character.' : 'Browse our collection of new products, carefully curated for quality and style. Find the perfect item that suits your needs and preferences.' }}
+                </p>
+            </div>
+
 
             {{-- Carousel (ยังไม่ได้ใส่รูปคับ) --}}
             <div class="swiper w-full h-[400px] rounded-xl overflow-hidden">

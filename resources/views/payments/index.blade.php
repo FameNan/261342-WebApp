@@ -65,7 +65,11 @@
                             <p class="text-green-600 font-bold mt-1">฿{{ number_format($payment->amount, 2) }}</p>
                             <p class="text-sm text-gray-500 mt-1">{{ \Carbon\Carbon::parse($payment->payment_date)->format('d/m/Y H:i') }}</p>
                             <a href="{{ route('payments.show', $payment->payment_id) }}"
-                               class="block mt-3 text-center text-sm bg-blue-600 text-white rounded-lg py-2 hover:bg-blue-700">
+                               class="block mt-3 text-center text-sm rounded-lg py-2"
+                               style="width:100%; padding:8px; background:var(--secondary); color:var(--surface); border:none; border-radius:8px; font-size:14px; cursor:pointer;
+                                        transition: opacity .2s ease, filter .2s ease;"
+                                        onmouseover="this.style.filter='brightness(0.92)';"
+                                        onmouseout="this.style.filter='brightness(1)';">
                                 View Details
                             </a>
                         </div>

@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl leading-tight" style="color: var(--secondary);">
             {{ __('Cart') }}
         </h2>
     </x-slot>
@@ -15,10 +15,8 @@
             @if (!$cart || $cart->items->isEmpty())
                 <p class="text-gray-500">Cart is empty</p>
             @else
-                {{-- ✅ เปลี่ยนจาก dark:bg-gray-800 → bg-white, เพิ่ม border --}}
                 <div class="bg-white shadow-sm border border-gray-200 rounded-2xl overflow-hidden">
                     <table class="w-full text-left">
-                        {{-- ✅ หัวตาราง: เปลี่ยนจาก dark:bg-gray-700 → bg-gray-50 --}}
                         <thead class="bg-gray-50 border-b border-gray-200">
                             <tr>
                                 <th class="p-4 text-sm font-medium text-gray-500">Product</th>
